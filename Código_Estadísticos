@@ -1,74 +1,171 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import skew, kurtosis
+
 def abrir_archivo(nombre_arch, dtype=np.int16):
     with open(nombre_arch, 'rb') as f:
         datos = np.fromfile(f, dtype=dtype)
     return datos
+
+def abrir_archivo_txt(nombre_arch):
+    try:
+        datos = np.loadtxt(nombre_arch)
+    except:
+        datos = np.genfromtxt(nombre_arch, skip_header=1)
+    if len(datos.shape) > 1:
+        datos = datos[:, -1]
+    return datos
+
 media_manual = 0
 N = 0
-resta_cuadrada = 0 #suma de los valores de xi - media al cuadrado
-resta_cubica = 0 #suma de los valores de xi - media al cubo
+resta_cuadrada = 0
+resta_cubica = 0
 resta_4 = 0
+
 datos_obtenidos = abrir_archivo('rec_1.dat')
-#abrir_archivo('40689238.dat') 
-signal = datos_obtenidos.astype(float) #Se convierten a float para poder ccoomptarizarlos
-for m in signal: 
+signal = datos_obtenidos.astype(float)
+
+for m in signal:
     media_manual += m
-    N = N+1
+    N += 1
+
 media_manual = media_manual / N
+
 for n in signal:
-    #dispersion manual
     resta = n - media_manual
-    resta_cuadrada = resta_cuadrada + resta**2
-    #Asimetria manual
-    resta_cubica = resta_cubica + resta**3
-    #Curtosis manual
-    resta_4 = resta_4 + resta**4
-#Estadisticos manuales
+    resta_cuadrada += resta**2
+    resta_cubica += resta**3
+    resta_4 += resta**4
+
 dispersion_man = np.sqrt((1/(N-1))*resta_cuadrada)
 coe_variacion_man = np.abs((dispersion_man/media_manual) * 100)
 asim_man = ((1/N)*resta_cubica) / (dispersion_man**3)
 curtosis_man = (((1/N)*resta_4)/(dispersion_man**4)) - 3
-#Estadisticos por funcion
-media = np.mean (datos_obtenidos)
-disp = np.std(datos_obtenidos, ddof =1) #funcion para la dispersion
+
+media = np.mean(datos_obtenidos)
+disp = np.std(datos_obtenidos, ddof=1)
 coe_variacion = np.abs((disp / media)*100)
-asim = skew (datos_obtenidos, bias = False)
-curtosis = kurtosis(datos_obtenidos, bias = False)
-Cv_inverso = coe_variacion /100
-Cv_inverso = 1 / Cv_inverso 
-#Relacion Señal-Ruido
+asim = skew(datos_obtenidos, bias=False)
+curtosis = kurtosis(datos_obtenidos, bias=False)
+
+Cv_inverso = 1 / (coe_variacion / 100)
 SNR = 20*np.log10(Cv_inverso)
-print ("-----ESTADISTICOS------")
-print ("Media calculada manualmente: ", media_manual, "\n")
-print ("Media calculada mediante funciones: ", media, "\n")
-print ("Dispersion calculada manualmente: ", dispersion_man, "\n")
-print ("Dispersion calculada mediante funciones: ", disp, "\n")
-print ("Coeficiente de variacion calculado manualmente: ", coe_variacion_man, "\n")
-print ("Coeficiente de variacion calculado mediante funciones: ", coe_variacion, "\n")
-print ("Asimetria calculada manualmente: ", asim_man, "\n")
-print ("Asimetria calculada mediante funciones: ", asim, "\n")
-print ("Curtosis calculada manualmente: ", curtosis_man, "\n")
-print ("Curtosis calculada mediante funciones: ", curtosis, "\n")
-print ("Relacion señal-ruido: ", SNR, "\n")
-plt.figure (figsize=(12,6))
-plt.plot(datos_obtenidos, linewidth=0.5)
-plt.title ('ECG')
+
+print("----- ESTADISTICOS rec_1.dat ------")
+print("Media manual:", media_manual)
+print("Media función:", media)
+print("Dispersion manual:", dispersion_man)
+print("Dispersion función:", disp)
+print("Coeficiente variacion manual:", coe_variacion_man)
+print("Coeficiente variacion función:", coe_variacion)
+print("Asimetria manual:", asim_man)
+print("Asimetria función:", asim)
+print("Curtosis manual:", curtosis_man)
+print("Curtosis función:", curtosis)
+print("Relacion señal-ruido:", SNR)
+print("\n")
+
+datos_txt = abrir_archivo_txt('senal.txt')
+signal_txt = datos_txt.astype(float)
+
+media_txt = np.mean(signal_txt)
+disp_txt = np.std(signal_txt, ddof=1)
+coe_variacion_txt = np.abs((disp_txt / media_txt) * 100)
+asim_txt = skew(signal_txt, bias=False)
+curtosis_txt = kurtosis(signal_txt, bias=False)
+
+Cv_inv_txt = 1 / (coe_variacion_txt / 100)
+SNR_txt = 20*np.log10(Cv_inv_txt)
+
+print("----- ESTADISTICOS senal.txt ------")
+print("Media:", media_txt)
+print("Dispersion:", disp_txt)
+print("Coeficiente variacion:", coe_variacion_txt)
+print("Asimetria:", asim_txt)
+print("Curtosis:", curtosis_txt)
+print("Relacion señal-ruido:", SNR_txt)
+print("\n")
+
+plt.figure(figsize=(12,6))
+plt.plot(signal, linewidth=0.5)
+plt.title('ECG - rec_1.dat')
 plt.xlabel('Tiempo (ms)')
 plt.ylabel('Amplitud (mV)')
-plt.axis([0,3000,-50, 150])
-plt.grid(True, alpha = 0.3)
-# Histograma
+plt.axis([0,3000,-50,150])
+plt.grid(True, alpha=0.3)
+
 plt.figure(figsize=(10,6))
 plt.hist(signal, bins=50, density=True)
-plt.title('Histograma')
+plt.title('Histograma - rec_1.dat')
 plt.xlabel('Amplitud (mV)')
 plt.ylabel('Densidad de probabilidad (mV^(-1))')
 plt.grid(True, alpha=0.3)
-
-# Línea de la media
 plt.axvline(media, linestyle='--')
+
+plt.figure(figsize=(12,6))
+plt.plot(signal_txt, linewidth=0.5)
+plt.title('Señal - senal.txt')
+plt.xlabel('Tiempo (muestras)')
+plt.ylabel('Amplitud')
+plt.grid(True, alpha=0.3)
+
+plt.figure(figsize=(10,6))
+plt.hist(signal_txt, bins=50, density=True)
+plt.title('Histograma - senal.txt')
+plt.xlabel('Amplitud')
+plt.ylabel('Densidad')
+plt.grid(True, alpha=0.3)
+plt.axvline(media_txt, linestyle='--')
+
+def calcular_snr(signal_original, signal_ruidosa):
+    potencia_signal = np.mean(signal_original**2)
+    potencia_ruido = np.mean((signal_original - signal_ruidosa)**2)
+    snr = 10 * np.log10(potencia_signal / potencia_ruido)
+    return snr
+
+signal_original = signal_txt
+
+sigma = 10
+ruido_gauss = np.random.normal(0, sigma, len(signal_original))
+signal_gauss = signal_original + ruido_gauss
+snr_gauss = calcular_snr(signal_original, signal_gauss)
+print("SNR Ruido Gaussiano (TXT):", snr_gauss, "dB")
+
+plt.figure(figsize=(12,6))
+plt.plot(signal_gauss, linewidth=0.5)
+plt.title('Señal con Ruido Gaussiano - senal.txt')
+plt.xlabel('Tiempo (muestras)')
+plt.ylabel('Amplitud')
+plt.grid(True, alpha=0.3)
+
+signal_impulso = signal_original.copy()
+probabilidad = 0.01
+indices = np.random.rand(len(signal_original)) < probabilidad
+signal_impulso[indices] = np.max(signal_original) * 3
+snr_impulso = calcular_snr(signal_original, signal_impulso)
+print("SNR Ruido Impulso (TXT):", snr_impulso, "dB")
+
+plt.figure(figsize=(12,6))
+plt.plot(signal_impulso, linewidth=0.5)
+plt.title('Señal con Ruido Impulso - senal.txt')
+plt.xlabel('Tiempo (muestras)')
+plt.ylabel('Amplitud')
+plt.grid(True, alpha=0.3)
+
+fs = 360
+t = np.arange(len(signal_original)) / fs
+frecuencia_artefacto = 0.5
+artefacto = 50 * np.sin(2 * np.pi * frecuencia_artefacto * t)
+signal_artefacto = signal_original + artefacto
+snr_artefacto = calcular_snr(signal_original, signal_artefacto)
+print("SNR Ruido Artefacto (TXT):", snr_artefacto, "dB")
+
+plt.figure(figsize=(12,6))
+plt.plot(signal_artefacto, linewidth=0.5)
+plt.title('Señal con Ruido Artefacto - senal.txt')
+plt.xlabel('Tiempo (muestras)')
+plt.ylabel('Amplitud')
+plt.grid(True, alpha=0.3)
 
 plt.show()
 
