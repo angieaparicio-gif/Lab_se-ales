@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import skew, kurtosis
-
+#FUNCIÓN PARA ABRIR ARCHIVO DE PHYSIONET
 def abrir_archivo(nombre_arch, dtype=np.int16):
     with open(nombre_arch, 'rb') as f:
         datos = np.fromfile(f, dtype=dtype)
     return datos
-
+#FUNCIÓN PARA ABRIR ARCHIVO TXT CAPTURADO CON LA STM
 def abrir_archivo_txt(nombre_arch):
     try:
         datos = np.loadtxt(nombre_arch)
@@ -15,7 +15,7 @@ def abrir_archivo_txt(nombre_arch):
     if len(datos.shape) > 1:
         datos = datos[:, -1]
     return datos
-
+#FUNCIONES CON CÁLCULOS MANUALES
 media_manual = 0
 N = 0
 resta_cuadrada = 0
@@ -41,7 +41,7 @@ dispersion_man = np.sqrt((1/(N-1))*resta_cuadrada)
 coe_variacion_man = np.abs((dispersion_man/media_manual) * 100)
 asim_man = ((1/N)*resta_cubica) / (dispersion_man**3)
 curtosis_man = (((1/N)*resta_4)/(dispersion_man**4)) - 3
-
+#FUNCIONES DE PHYTON 
 media = np.mean(datos_obtenidos)
 disp = np.std(datos_obtenidos, ddof=1)
 coe_variacion = np.abs((disp / media)*100)
@@ -49,8 +49,9 @@ asim = skew(datos_obtenidos, bias=False)
 curtosis = kurtosis(datos_obtenidos, bias=False)
 
 Cv_inverso = 1 / (coe_variacion / 100)
+# RELACIÓN SEÑAL RUIDO
 SNR = 20*np.log10(Cv_inverso)
-
+# IMPRESIÓN EN EL TERMINAL DE IDLE PHYTON DE LOS RESULTADOS
 print("----- ESTADISTICOS rec_1.dat ------")
 print("Media manual:", media_manual)
 print("Media función:", media)
