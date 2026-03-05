@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import skew, kurtosis
-## Función que permite abrir archivo de physionet
 ##Función que permite abrir el archivo .txt
 def abrir_archivo_txt(nombre_arch):
     try:
@@ -101,5 +100,6 @@ plt.title('Señal con Ruido Artefacto - senal.txt')
 plt.xlabel('Tiempo (ms)')
 plt.ylabel('Amplitud (mV)')
 plt.grid(True, alpha=0.3)
+
 
 plt.show()
