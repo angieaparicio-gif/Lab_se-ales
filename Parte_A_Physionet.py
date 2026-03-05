@@ -17,8 +17,8 @@ def graficar_senal(datos_graf):
 def estadisticos (data, encabezado):
     media_manual = 0
     N = 0
-    resta_cuadrada = 0 #suma de los valores de xi - media al cuadrado
-    resta_cubica = 0 #suma de los valores de xi - media al cubo
+    resta_cuadrada = 0 
+    resta_cubica = 0
     resta_4 = 0
     signal = data.astype(float) #Se convierten a float para poder computarizarlos
     for m in signal: 
@@ -40,13 +40,12 @@ def estadisticos (data, encabezado):
     curtosis_man = (((1/N)*resta_4)/(dispersion_man**4)) - 3
     #Estadisticos por funcion
     media = np.mean (data)
-    disp = np.std(data, ddof =1) #funcion para la dispersion
+    disp = np.std(data, ddof =1) 
     coe_variacion = np.abs((disp / media)*100)
     asim = skew (data, bias = False)
     curtosis = kurtosis(data, bias = False)
     Cv_inverso = coe_variacion /100
     Cv_inverso = 1 / Cv_inverso 
-    #Relacion Señal-Ruido
     SNR = 20*np.log10(Cv_inverso)
     print (f"-----ESTADISTICOS {encabezado}------")
     print ("Media calculada manualmente: ", media_manual, "\n")
@@ -72,4 +71,5 @@ def estadisticos (data, encabezado):
 arch_data = abrir_archivo('rec_10.dat')
 graficar_senal (arch_data)
 estadisticos (arch_data, 'rec_10.dat')
+
 plt.show()
