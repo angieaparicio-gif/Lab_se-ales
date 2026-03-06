@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.stats import skew, kurtosis
+from scipy.stats import skew, kurtosis#importar librerias
 #Funciones
 def abrir_archivo(nombre_arch, dtype=np.int16):
     with open(nombre_arch, 'rb') as f:
         datos = np.fromfile(f, dtype=dtype)
     return datos
-def graficar_senal(datos_graf):
+def graficar_senal(datos_graf): #funcion para graficar señal 
     plt.figure (figsize=(12,6))
     plt.plot(datos_graf, linewidth=0.5)
     plt.title ('ECG')
@@ -14,7 +14,7 @@ def graficar_senal(datos_graf):
     plt.ylabel('Amplitud (mV)')
     plt.axis([0,3000,-50, 150])
     plt.grid(True, alpha = 0.3)
-def estadisticos (data, encabezado):
+def estadisticos (data, encabezado): #funcion para calcular datos estadisticos
     media_manual = 0
     N = 0
     resta_cuadrada = 0 
@@ -34,20 +34,20 @@ def estadisticos (data, encabezado):
         #Curtosis manual
         resta_4 = resta_4 + resta**4
     #Estadisticos manuales
-    dispersion_man = np.sqrt((1/(N-1))*resta_cuadrada)
-    coe_variacion_man = np.abs((dispersion_man/media_manual) * 100)
-    asim_man = ((1/N)*resta_cubica) / (dispersion_man**3)
-    curtosis_man = (((1/N)*resta_4)/(dispersion_man**4)) - 3
+    dispersion_man = np.sqrt((1/(N-1))*resta_cuadrada)#desviacion estandar
+    coe_variacion_man = np.abs((dispersion_man/media_manual) * 100)#coeficiente de variacion 
+    asim_man = ((1/N)*resta_cubica) / (dispersion_man**3)#asimetria
+    curtosis_man = (((1/N)*resta_4)/(dispersion_man**4)) - 3 #curtosis
     #Estadisticos por funcion
-    media = np.mean (data)
-    disp = np.std(data, ddof =1) 
-    coe_variacion = np.abs((disp / media)*100)
-    asim = skew (data, bias = False)
-    curtosis = kurtosis(data, bias = False)
-    Cv_inverso = coe_variacion /100
+    media = np.mean (data)#media
+    disp = np.std(data, ddof =1) #desviacion estandar
+    coe_variacion = np.abs((disp / media)*100) #coeficiente de variacion
+    asim = skew (data, bias = False) #asimetria
+    curtosis = kurtosis(data, bias = False)#curtosis
+    Cv_inverso = coe_variacion /100#relacion señal ruido 
     Cv_inverso = 1 / Cv_inverso 
     SNR = 20*np.log10(Cv_inverso)
-    print (f"-----ESTADISTICOS {encabezado}------")
+    print (f"-----ESTADISTICOS {encabezado}------")#impresion de resultados
     print ("Media calculada manualmente: ", media_manual, "\n")
     print ("Media calculada mediante funciones: ", media, "\n")
     print ("Dispersion calculada manualmente: ", dispersion_man, "\n")
@@ -73,3 +73,4 @@ graficar_senal (arch_data)
 estadisticos (arch_data, 'rec_10.dat')
 
 plt.show()
+
